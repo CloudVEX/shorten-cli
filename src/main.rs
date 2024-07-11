@@ -13,8 +13,6 @@ use toml::Value;
 struct Cli {
     #[command(subcommand)]
     command: Commands,
-    #[clap(short, long, default_value = "shorten")]
-    default_command: String,
 }
 
 #[derive(Subcommand)]
