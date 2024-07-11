@@ -1,0 +1,13 @@
+[package]
+name = "shorten-cli"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+dirs = "5.0.1"
+reqwest = "0.12.5"
+serde = { version = "1.0.204", features = ["derive"] }
+serde_json = "1.0.120"
+tokio = { version = "1.38.0", features = ["full"] }
+toml = "0.8.14"
