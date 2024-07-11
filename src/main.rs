@@ -8,7 +8,7 @@ use toml::Value;
     name = "shorten-cli",
     version = "1.0",
     author = "Cloud",
-    about = "A CLI app for my url shortening api"
+    about = "A CLI for my url shortening api"
 )]
 struct Cli {
     #[command(subcommand)]
