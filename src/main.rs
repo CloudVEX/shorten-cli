@@ -32,6 +32,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = Client::new();
     let shorten_config = value["shorten"].clone();
+    let server = shorten_config["username"].as_str();
+    let server = match server {
+        Some(value) => value,
+        None => "l.cloudvex.de",
+    };
 
     match cli.command {
         Commands::RM { url } => {
@@ -47,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 username, password
             );
             let response = client
-                .delete(format!("https://l.cloudvex.de/{}", url))
+                .delete(format!("https://{}/{}", server, url))
                 .body(body)
                 .send()
                 .await?
@@ -59,18 +64,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::CR { url } => {
             let body = format!("{{\"url\": \"{}\"}}", url);
             let response = client
-                .post("https://l.cloudvex.de/shorten")
+                .post(format!("https://{}/shorten", server))
                 .body(body)
                 .send()
                 .await?
                 .text()
                 .await?;
 
-            println!("https://l.cloudvex.de/{}", response);
+            println!("No server set, using fallback, please consider hosting your own instance of https://github.com/CloudVEX/url-short");
+            println!("https://{}/{}", server, response);
         }
         Commands::GET { url } => {
             let response = client
-                .get(format!("https://l.cloudvex.de/{}", url))
+                .get(format!("https://{}/{}", server, url))
                 .send()
                 .await?;
 
