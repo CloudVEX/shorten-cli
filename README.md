@@ -1,5 +1,5 @@
 # shorten-cli
-[![License](https://img.shields.io/badge/license-Apache-orange.svg)](https://github.com/CloudVEX/shorten-cli/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-orange.svg)](https://github.com/CloudVEX/shorten-cli/blob/main/LICENSE)
 [![Created](https://img.shields.io/github/created-at/CloudVEX/shorten-cli?color=orange
 )](https://github.com/CloudVEX/shorten-cli)
 [![Activity](https://img.shields.io/github/commit-activity/m/CloudVEX/shorten-cli?color=orange
