@@ -1,6 +1,8 @@
+use std::process;
+
 use clap::{Parser, Subcommand};
 use reqwest::Client;
-use tokio::{self, fs::File};
+use tokio;
 use toml::Value;
 
 #[derive(Parser)]
@@ -25,10 +27,28 @@ enum Commands {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
-    let config_path =
-        format!("{:?}/cli.toml", dirs::config_dir().expect("Unsupported OS")).replace("\"", "");
-    let config_str = std::fs::read_to_string(config_path).expect("Failed to read config file, copy the example config to your home path if you didn't already.");
-    let value = config_str.parse::<Value>().expect("Failed to parse TOML");
+    let raw_config_path = match dirs::config_dir() {
+        Some(path) => path,
+        None => {
+            println!("Your file structure or operating system isn't supported.");
+            process::exit(1);
+        }
+    };
+    let config_path = format!("{:?}/cli.toml", raw_config_path).replace("\"", "");
+    let config_str = match std::fs::read_to_string(config_path) {
+        Ok(str) => str,
+        Err(_) => {
+            println!("Failed to read config file, copy the example config to your config path if you didn't already.");
+            process::exit(1);
+        }
+    };
+    let value = match config_str.parse::<Value>() {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Failed to parse the config, possibly because of syntax errors.");
+            process::exit(1);
+        }
+    };
 
     let client = Client::new();
     let shorten_config = value["shorten"].clone();
@@ -40,12 +60,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     match cli.command {
         Commands::RM { url } => {
-            let username = shorten_config["username"]
-                .as_str()
-                .expect("Username not set");
-            let password = shorten_config["password"]
-                .as_str()
-                .expect("Password not set");
+            let username = match shorten_config["username"].as_str() {
+                Some(value) => value,
+                None => {
+                    println!("Username not set in the config.");
+                    process::exit(1);
+                }
+            };
+            let password = match shorten_config["password"].as_str() {
+                Some(value) => value,
+                None => {
+                    println!("Username not set in the config.");
+                    process::exit(1);
+                }
+            };
 
             let body = format!(
                 "{{\"username\": \"{}\", \"password\": \"{}\"}}",
