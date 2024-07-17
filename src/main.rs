@@ -1,7 +1,7 @@
 use std::process;
 
 use clap::{Parser, Subcommand};
-use reqwest::Client;
+use reqwest::{Client, Error, Response};
 use tokio;
 use toml::Value;
 
@@ -79,38 +79,65 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "{{\"username\": \"{}\", \"password\": \"{}\"}}",
                 username, password
             );
-            let response = client
-                .delete(format!("https://{}/{}", server, url))
-                .body(body)
-                .send()
-                .await?
-                .text()
-                .await?;
+            let response = decode_response(
+                client
+                    .delete(format!("https://{}/{}", server, url))
+                    .body(body)
+                    .send()
+                    .await,
+            )
+            .await;
 
             println!("{}", response)
         }
         Commands::CR { url } => {
             let body = format!("{{\"url\": \"{}\"}}", url);
-            let response = client
-                .post(format!("https://{}/shorten", server))
-                .body(body)
-                .send()
-                .await?
-                .text()
-                .await?;
+            let response = decode_response(
+                client
+                    .post(format!("https://{}/shorten", server))
+                    .body(body)
+                    .send()
+                    .await,
+            )
+            .await;
 
             println!("\nNo server set, using fallback, please consider hosting your own instance of https://github.com/CloudVEX/url-short\n");
             println!("https://{}/{}", server, response);
         }
         Commands::GET { url } => {
-            let response = client
+            let response = match client
                 .get(format!("https://{}/{}", server, url))
                 .send()
-                .await?;
+                .await
+            {
+                Ok(value) => value,
+                Err(_) => {
+                    println!("Unable to connect to the server.");
+                    process::exit(1);
+                }
+            };
 
             println!("{}", response.url())
         }
     }
 
     Ok(())
+}
+
+async fn decode_response(raw: Result<Response, Error>) -> String {
+    let raw = match raw {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Unable to connect to the server.");
+            process::exit(1);
+        }
+    };
+
+    return match raw.text().await {
+        Ok(value) => value,
+        Err(_) => {
+            println!("Unable to decode the response from the server.");
+            process::exit(1);
+        }
+    };
 }
