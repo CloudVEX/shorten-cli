@@ -52,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = Client::new();
     let shorten_config = value["shorten"].clone();
-    let server = shorten_config["username"].as_str();
+    let server = shorten_config["server"].as_str();
     let server = match server {
         Some(value) => value,
         None => "l.cloudvex.de",
@@ -99,7 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .text()
                 .await?;
 
-            println!("No server set, using fallback, please consider hosting your own instance of https://github.com/CloudVEX/url-short");
+            println!("\nNo server set, using fallback, please consider hosting your own instance of https://github.com/CloudVEX/url-short\n");
             println!("https://{}/{}", server, response);
         }
         Commands::GET { url } => {
