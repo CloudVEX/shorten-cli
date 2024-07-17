@@ -34,7 +34,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             process::exit(1);
         }
     };
-    let config_path = format!("{:?}/cli.toml", raw_config_path).replace("\"", "");
+    let config_path = format!("{:?}/shorten-cli/cli.toml", raw_config_path).replace("\"", "");
     let config_str = match std::fs::read_to_string(config_path) {
         Ok(str) => str,
         Err(_) => {
@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let password = match shorten_config["password"].as_str() {
                 Some(value) => value,
                 None => {
-                    println!("Username not set in the config.");
+                    println!("Password not set in the config.");
                     process::exit(1);
                 }
             };
