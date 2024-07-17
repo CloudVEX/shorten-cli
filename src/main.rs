@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 use reqwest::Client;
-use tokio;
+use tokio::{self, fs::File};
 use toml::Value;
 
 #[derive(Parser)]
@@ -26,8 +26,8 @@ enum Commands {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
     let config_path =
-        format!("{:?}/cli.toml", dirs::home_dir().expect("Unsupported OS")).replace("\"", "");
-    let config_str = std::fs::read_to_string(config_path).expect("Failed to read config file");
+        format!("{:?}/cli.toml", dirs::config_dir().expect("Unsupported OS")).replace("\"", "");
+    let config_str = std::fs::read_to_string(config_path).expect("Failed to read config file, copy the example config to your home path if you didn't already.");
     let value = config_str.parse::<Value>().expect("Failed to parse TOML");
 
     let client = Client::new();
